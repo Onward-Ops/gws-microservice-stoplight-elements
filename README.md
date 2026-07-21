@@ -5,9 +5,11 @@ Inspired by [NestJS-Redoc](https://github.com/mxarc/nestjs-redoc)
 
 It's almost a drop in replacement for you current swagger UI, you only need to import this package and modify any settings you may want to change
 
+> Maintained by Onward Ops as `@onwardops/nestjs-stoplight-elements`, a fork of [nestjs-stoplight-elements](https://github.com/nomansheikh/nestjs-stoplight-elements) by Noman Sheikh (MIT).
+
 ## Installation
 
-`npm i @nomansheikh/nestjs-stoplight-elements`
+`npm i @onwardops/nestjs-stoplight-elements`
 
 ## How to use
 
@@ -57,3 +59,29 @@ From [Stoplight Elements Docs](https://meta.stoplight.io/docs/elements/ZG9jOjUxM
   - `hash` - uses the hash portion of the URL (i.e. window.location.hash) to keep the UI in sync with the URL.
   - `memory` - keeps the history of your "URL" in memory (does not read or write to the address bar).
   - `static` - renders using the StaticRouter which can help rendering pages on the server.
+
+## Releasing
+
+Releases are fully automated. Every merge to `main` runs
+[`.github/workflows/publish.yml`](.github/workflows/publish.yml), which:
+
+1. Builds and tests the package.
+2. Reads the latest version published on npm and computes the next patch version.
+3. Publishes it to npm as `@onwardops/nestjs-stoplight-elements` via
+   [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC).
+
+There is no manual step: no tags, GitHub Releases, or tokens to create or rotate.
+
+**Notes for maintainers**
+
+- **npm is the source of truth for versions.** The workflow does not commit a
+  version bump or push a tag back to the repo, so the `version` in `package.json`
+  is not authoritative; check the published version on npm.
+- It does not write to the repository at all, because the organization enforces
+  read-only `GITHUB_TOKEN` permissions. It derives the next version from npm, so
+  it needs no elevated permission and no push credential.
+- Every merge to `main` publishes a new patch version, including docs- or CI-only
+  changes. Batch trivial commits if you want to avoid version churn.
+- Publishing uses OIDC, so there is no `NPM_TOKEN`. It requires the trusted
+  publisher on npm to be configured for this repository and the `publish.yml`
+  workflow.

@@ -1,18 +1,28 @@
 name: Publish to npm
 
+# Auto-release: every merge to main publishes the next patch version to npm via
+# trusted publishing (OIDC). No manual GitHub Release and no NPM_TOKEN.
+#
+# The enterprise policy caps GITHUB_TOKEN to read-only, so we do NOT commit a
+# version bump or push a tag back to the repo. The next version is derived from
+# what is already published on npm, and set only in this ephemeral checkout.
+# npm is the source of truth for versions; the repo's package.json version is not.
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
 
 permissions:
   contents: read
   id-token: write # OIDC token for npm trusted publishing (no NPM_TOKEN needed)
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+# Serialize releases so two quick merges cannot compute and publish the same version.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   publish:
-    name: Test and Publish
+    name: Publish
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +46,16 @@ jobs:
 
       - name: Test packages
         run: yarn test
+
+      # Derive the next patch version from the latest published on npm, and set it
+      # in this checkout only (no git commit, no tag).
+      - name: Determine and set next version
+        run: |
+          LATEST=$(npm view @onwardops/nestjs-stoplight-elements version 2>/dev/null || echo "")
+          if [ -z "$LATEST" ]; then LATEST=$(node -p "require('./package.json').version"); fi
+          NEXT=$(node -e 'const [a,b,c]=process.argv[1].split("."); console.log(a+"."+b+"."+(Number(c)+1))' "$LATEST")
+          echo "Publishing ${NEXT} (latest on npm: ${LATEST})"
+          npm version "$NEXT" --no-git-tag-version
 
       # Publishes via npm trusted publishing (OIDC): npm exchanges this workflow's
       # id-token for a short-lived credential, so no NPM_TOKEN secret is needed.

@@ -1,4 +1,10 @@
-# @nomansheikh/nestjs-stoplight-elements
+# @onwardops/nestjs-stoplight-elements
+
+## 1.2.2
+
+### Changes
+
+- Republished as the Onward Ops fork under `@onwardops/nestjs-stoplight-elements`. No functional change from the upstream `1.2.0`.
 
 ## 1.2.0
 
