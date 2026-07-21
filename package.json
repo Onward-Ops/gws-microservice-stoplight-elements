@@ -1,5 +1,5 @@
 {
-  "name": "@nomansheikh/nestjs-stoplight-elements",
+  "name": "@onwardops/nestjs-stoplight-elements",
   "version": "1.2.0",
   "publishConfig": {
     "access": "public"
@@ -20,10 +20,13 @@
     "openapi",
     "documentation"
   ],
-  "author": "Noman Sheikh",
+  "author": "Onward Ops",
+  "contributors": [
+    "Noman Sheikh (original author of nestjs-stoplight-elements)"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nomansheikh/nestjs-stoplight-elements.git"
+    "url": "https://github.com/Onward-Ops/gws-microservice-stoplight-elements.git"
   },
   "scripts": {
     "test": "yarn lint",
