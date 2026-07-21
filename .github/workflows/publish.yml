@@ -39,7 +39,10 @@ jobs:
       - name: Setup npm authentication
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
+      # Publish with npm (not yarn): yarn 1.x publishes to registry.yarnpkg.com,
+      # which the token in ~/.npmrc is not scoped to, so the token never reaches
+      # the request. npm publishes to registry.npmjs.org, where the token applies.
       - name: Publish to npm
-        run: yarn publish --access public --non-interactive
+        run: npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
