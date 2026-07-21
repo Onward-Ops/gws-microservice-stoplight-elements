@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write # OIDC token for npm trusted publishing (no NPM_TOKEN needed)
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -36,13 +37,9 @@ jobs:
       - name: Test packages
         run: yarn test
 
-      - name: Setup npm authentication
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
-      # Publish with npm (not yarn): yarn 1.x publishes to registry.yarnpkg.com,
-      # which the token in ~/.npmrc is not scoped to, so the token never reaches
-      # the request. npm publishes to registry.npmjs.org, where the token applies.
+      # Publishes via npm trusted publishing (OIDC): npm exchanges this workflow's
+      # id-token for a short-lived credential, so no NPM_TOKEN secret is needed.
+      # Requires the trusted publisher configured on the package on npmjs, and
+      # npm >= 11.5.1 (bundled with the Node 24 runtime above).
       - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
